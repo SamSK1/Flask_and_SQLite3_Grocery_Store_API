@@ -29,8 +29,24 @@ def home_page():
     return re(msg,mimetype='text/plain')
 
 
+@app.route('/list_of_all_items')
+def all_items():
+    items=[]
+
+    try:
+        with sqlite3.connect('groceries.db') as db:
+            db.row_factory=sqlite3.Row
+            cursor=db.cursor()
+            cursor.execute('SELECT * FROM Items')
+            items=cursor.fetchall()
+    except Exception as e:
+        db.rollback()
+        return jsonify('Error: '+str(e))
+    finally:
+        return jsonify([dict(x) for x in items]) if items else jsonify('No items in the DB')
+
 
 if __name__=='__main__':
     app.run(debug=True)
-
+    
  
