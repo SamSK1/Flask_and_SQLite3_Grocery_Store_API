@@ -46,6 +46,34 @@ def all_items():
         return jsonify([dict(x) for x in items]) if items else jsonify('No items in the DB')
 
 
+@app.route('/add_item',methods=['POST'])
+def add_item():
+    msg=None
+
+    try:
+        data=request.get_json()
+        item_name=data['item_name']
+        item_price=data['item_price'] if data['item_price'] else 0
+        item_quant=data['item_quant'] if data['item_quant'] else 0
+
+        with sqlite3.connect('groceries.db') as db:
+            cursor=db.cursor()
+            cursor.execute('INSERT INTO Items (item_name,item_price,item_quant) VALUES (?,?,?)',(item_name,item_price,item_quant))
+            db.commit()
+            msg=f'Item {item_name} has been added to the DB with the quantity of {item_quant}!'
+    except Exception as e:
+        db.rollback()
+        msg='Error: '+str(e)
+    finally:
+        return jsonify(msg=msg)
+    
+
+
+
+
+
+
+
 if __name__=='__main__':
     app.run(debug=True)
     
