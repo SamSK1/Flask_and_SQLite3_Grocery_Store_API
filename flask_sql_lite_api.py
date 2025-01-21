@@ -29,7 +29,7 @@ def home_page():
     return re(msg,mimetype='text/plain')
 
 
-@app.route('/list_of_all_items',methods=['GET'])
+@app.route('/all_items',methods=['GET'])
 def all_items():
     items=[]
 
