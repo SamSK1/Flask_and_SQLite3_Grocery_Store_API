@@ -10,7 +10,7 @@ def connect_db():
     db.execute('CREATE TABLE IF NOT EXISTS Items (item_id INTEGER PRIMARY KEY, item_name TEXT, item_price REAL, item_quant)')
     db.commit()
 
-# connect_db()
+connect_db()
 
 
 @app.route('/')
