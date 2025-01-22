@@ -50,6 +50,7 @@ def all_items():
 def add_item():
     msg=None
 
+
     try:
         data=request.get_json()
         item_name=data['item_name']
@@ -67,7 +68,24 @@ def add_item():
     finally:
         return jsonify(msg=msg)
     
+    
 
+@app.route('/get_item_by_id/<int:item_id>')
+def get_item_by_id(item_id):
+    item=None
+
+    try:
+        with sqlite3.connect('groceries.db') as db:
+            db.row_factory=sqlite3.Row
+            cursor=db.cursor()
+            cursor.execute('SELECT * FROM Items WHERE item_id=?',(item_id,))
+            item=cursor.fetchone()
+
+    except Exception as e:
+        db.rollback()
+        return jsonify('Error: '+str(e))
+    finally:
+        return jsonify(dict(item)) if item else jsonify('No item with this id found!'),404
 
 
 
