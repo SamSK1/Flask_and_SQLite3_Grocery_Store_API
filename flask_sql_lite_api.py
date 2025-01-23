@@ -10,7 +10,7 @@ def connect_db():
     db.execute('CREATE TABLE IF NOT EXISTS Items (item_id INTEGER PRIMARY KEY, item_name TEXT, item_price REAL, item_quant)')
     db.commit()
 
-connect_db()
+# connect_db()
 
 
 @app.route('/')
@@ -88,6 +88,21 @@ def get_item_by_id(item_id):
         return jsonify(dict(item)) if item else jsonify('No item with this id found!'),404
 
 
+@app.route('/available_items')
+def available_items():
+    items=[]
+
+    try:
+        with sqlite3.connect('groceries.db') as db:
+            db.row_factory=sqlite3.Row
+            cursor=db.cursor()
+            cursor.execute('SELECT * FROM Items WHERE item_quant>0')
+            items=cursor.fetchall()
+    except Exception as e:
+        db.rollback()
+        return jsonify('Error: '+str(e))
+    finally:
+        return jsonify([dict(x) for x in items]) if items else jsonify('No items with the quantity more than 0 in the DB')
 
 
 
