@@ -1,6 +1,6 @@
 
 *.db
-
+groceries.db
 __pycache__/
 *.py[cod]
 

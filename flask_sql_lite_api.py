@@ -10,7 +10,7 @@ def connect_db():
     db.execute('CREATE TABLE IF NOT EXISTS Items (item_id INTEGER PRIMARY KEY, item_name TEXT, item_price REAL, item_quant)')
     db.commit()
 
-# connect_db()
+connect_db()
 
 
 @app.route('/')
@@ -70,7 +70,7 @@ def add_item():
     
     
 
-@app.route('/get_item_by_id/<int:item_id>')
+@app.route('/get_item_by_id/<int:item_id>',methods=['GET'])
 def get_item_by_id(item_id):
     item=None
 
@@ -104,6 +104,46 @@ def available_items():
     finally:
         return jsonify([dict(x) for x in items]) if items else jsonify('No items with the quantity more than 0 in the DB')
 
+
+
+
+@app.route('/available_items_total_cost',methods=['GET'])
+def available_items_total_cost():
+
+    items=[]
+    item_cost=0
+    item_name=''
+    item_arr={}
+    total_cost=0
+    try:
+        with sqlite3.connect('groceries.db') as db:
+            db.row_factory=sqlite3.Row
+            cursor=db.cursor()
+            cursor.execute('SELECT * FROM Items WHERE item_quant>0')
+            items=cursor.fetchall()
+    except Exception as e:
+        db.rollback()
+        return jsonify('Error: '+str(e))
+    
+    finally:
+        
+        for i in items:
+            # dict(i)
+            
+            item_name=i[1]
+            item_cost=i[2]*i[3]
+            item_arr[item_name]=item_cost
+            
+            print(item_arr)
+            print('!!!!!!')
+            item_cost=0
+            item_name=''
+        
+        for x in item_arr.values():
+            total_cost+=x
+        item_arr.update({"1. All items cost":total_cost})
+        
+        return jsonify(item_arr)
 
 
 
