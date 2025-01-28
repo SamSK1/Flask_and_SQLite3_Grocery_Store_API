@@ -147,6 +147,15 @@ def available_items_total_cost():
 
 
 
+@app.route('/update_item/<int:item_id>',methods=['PUT'])
+def update_item(item_id):
+    pass
+
+
+
+
+
+
 if __name__=='__main__':
     app.run(debug=True)
     
