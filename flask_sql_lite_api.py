@@ -149,7 +149,33 @@ def available_items_total_cost():
 
 @app.route('/update_item/<int:item_id>',methods=['PUT'])
 def update_item(item_id):
-    pass
+    msg=None
+
+
+    try:
+        data=request.get_json()
+        item_name=data.get('item_name')
+        item_price=data.get('item_price')
+        item_quant=data.get('item_quant')
+
+        with sqlite3.connect('groceries.db') as db:
+            db.row_factory=sqlite3.Row
+            cursor=db.cursor()
+            cursor.execute('SELECT * FROM Items WHERE item_id=?',(item_id,))
+            item=cursor.fetchone()
+
+            if item:
+                cursor.execute('''UPDATE Items SET item_name=?,item_price=?,item_quant=? WHERE item_id=?''',(item_name,item_price,item_quant,item_id))
+                msg=f'Item {item_name} has been updated!'
+            else:
+                msg=f'Item with item_id:{item_id} was not found!'
+    except Exception as e:
+        db.rollback()
+        msg='Error: '+str(e)
+    
+    finally:
+        return jsonify(msg=msg)
+
 
 
 
