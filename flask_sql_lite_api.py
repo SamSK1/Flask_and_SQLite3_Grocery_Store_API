@@ -88,7 +88,7 @@ def get_item_by_id(item_id):
         return jsonify(dict(item)) if item else jsonify('No item with this id found!'),404
 
 
-@app.route('/available_items')
+@app.route('/available_items',methods=['GET'])
 def available_items():
     items=[]
 
@@ -176,6 +176,29 @@ def update_item(item_id):
     finally:
         return jsonify(msg=msg)
 
+
+@app.route('/delete_item/<int:item_id>',methods=['DELETE'])
+def delete_item(item_id):
+    msg=None
+
+    try:
+        with sqlite3.connect('groceries.db') as db:
+            db.row_factory=sqlite3.Row
+            cursor=db.cursor()
+            cursor.execute('SELECT * FROM Items WHERE item_id=?',(item_id,))
+            item=cursor.fetchone()
+
+            if item:
+                cursor.execute('DELETE FROM Items WHERE item_id=?',(item_id,))
+                msg='Item has been deleted!'
+            
+            else:
+                msg='No item found with this id!'
+    except Exception as e:
+        db.rollback()
+        msg='Error: '+str(e)
+    finally:
+        return jsonify(msg=msg)
 
 
 
